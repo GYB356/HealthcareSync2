@@ -16,6 +16,11 @@ const Appointments = () => {
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
+    if (!hasRole(['doctor', 'nurse', 'admin', 'patient'])) {
+      setError('Access Denied');
+      return;
+    }
+
     fetchAppointments();
 
     if (socket) {
@@ -31,7 +36,7 @@ const Appointments = () => {
         socket.off('appointmentDeleted', handleAppointmentDelete);
       }
     };
-  }, [socket]);
+  }, [hasRole, socket]);
 
   const fetchAppointments = async () => {
     try {
@@ -133,15 +138,12 @@ const Appointments = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading appointments...</p>
-        </div>
-      </div>
-    );
+  if (error) {
+    return <div className="text-red-500">{error}</div>;
+  }
+
+  if (!appointments.length) {
+    return <div>Loading...</div>;
   }
 
   return (

@@ -7,7 +7,7 @@ const Navbar = () => {
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
     
-    const { user, logout } = useAuth();
+    const { user, logout, hasRole } = useAuth();
     const location = useLocation();
     
     const toggleMenu = () => {
@@ -83,6 +83,32 @@ const Navbar = () => {
                             >
                                 Dashboard
                             </Link>
+                            
+                            {hasRole(['doctor', 'nurse', 'admin']) && (
+                                <Link 
+                                    to="/telemedicine" 
+                                    className={`${
+                                        location.pathname === '/telemedicine' 
+                                            ? 'border-blue-500 text-gray-900' 
+                                            : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                                    } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
+                                >
+                                    Telemedicine
+                                </Link>
+                            )}
+                            
+                            {hasRole(['admin', 'staff']) && (
+                                <Link 
+                                    to="/staff-scheduling" 
+                                    className={`${
+                                        location.pathname === '/staff-scheduling' 
+                                            ? 'border-blue-500 text-gray-900' 
+                                            : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                                    } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
+                                >
+                                    Staff Scheduling
+                                </Link>
+                            )}
                             
                             <Link 
                                 to="/patients" 
@@ -296,6 +322,32 @@ const Navbar = () => {
                     >
                         Dashboard
                     </Link>
+                    
+                    {hasRole(['doctor', 'nurse', 'admin']) && (
+                        <Link
+                            to="/telemedicine"
+                            className={`${
+                                location.pathname === '/telemedicine'
+                                    ? 'bg-blue-50 border-blue-500 text-blue-700'
+                                    : 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800'
+                            } block pl-3 pr-4 py-2 border-l-4 text-base font-medium`}
+                        >
+                            Telemedicine
+                        </Link>
+                    )}
+                    
+                    {hasRole(['admin', 'staff']) && (
+                        <Link
+                            to="/staff-scheduling"
+                            className={`${
+                                location.pathname === '/staff-scheduling'
+                                    ? 'bg-blue-50 border-blue-500 text-blue-700'
+                                    : 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800'
+                            } block pl-3 pr-4 py-2 border-l-4 text-base font-medium`}
+                        >
+                            Staff Scheduling
+                        </Link>
+                    )}
                     
                     <Link
                         to="/patients"

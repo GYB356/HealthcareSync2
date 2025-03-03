@@ -213,4 +213,10 @@ describe('StaffScheduling Component', () => {
     expect(screen.queryByText('Add Schedule')).not.toBeInTheDocument();
     expect(screen.queryByText('Delete')).not.toBeInTheDocument();
   });
+
+  it('renders the Staff Scheduling page', () => {
+    render(<StaffScheduling />);
+    expect(screen.getByText('Staff Scheduling')).toBeInTheDocument();
+    expect(screen.getByText('Welcome to the Staff Scheduling page.')).toBeInTheDocument();
+  });
 }); 

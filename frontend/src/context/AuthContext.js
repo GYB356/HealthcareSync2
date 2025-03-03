@@ -2,16 +2,10 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
 // Create the auth context
-const AuthContext = createContext(null);
+const AuthContext = createContext();
 
 // Custom hook to use the auth context
-export const useAuth = () => {
-    const context = useContext(AuthContext);
-    if (!context) {
-        throw new Error('useAuth must be used within an AuthProvider');
-    }
-    return context;
-};
+export const useAuth = () => useContext(AuthContext);
 
 // Provider component
 export const AuthProvider = ({ children }) => {
@@ -138,16 +132,9 @@ export const AuthProvider = ({ children }) => {
     };
     
     // Check if user has a specific role
-    const hasRole = (role) => {
-        if (!user) {
-            return false;
-        }
-        
-        if (Array.isArray(role)) {
-            return role.includes(user.role);
-        }
-        
-        return user.role === role;
+    const hasRole = (roles) => {
+        if (!user) return false;
+        return roles.includes(user.role);
     };
     
     // Context value

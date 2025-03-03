@@ -23,6 +23,7 @@ import StaffScheduling from './pages/StaffScheduling';
 import AnalyticsDashboard from './pages/AnalyticsDashboard';
 import HIPAADocs from './pages/HIPAADocs';
 import DeviceIntegration from './pages/DeviceIntegration';
+import Telemedicine from './pages/Telemedicine';
 
 function App() {
     return (
@@ -96,6 +97,9 @@ function App() {
                                 <DeviceIntegration />
               </ProtectedRoute>
             } />
+            
+            {/* Telemedicine - accessible to all authenticated users */}
+            <Route path="telemedicine" element={<Telemedicine />} />
           </Route>
           
           {/* 404 Not Found */}

@@ -169,4 +169,10 @@ describe('Telemedicine Component', () => {
     // Verify cleanup
     expect(mockGetUserMedia().getTracks()[0].stop).toHaveBeenCalled();
   });
+
+  it('renders the Telemedicine page', () => {
+    render(<Telemedicine />);
+    expect(screen.getByText('Telemedicine')).toBeInTheDocument();
+    expect(screen.getByText('Welcome to the Telemedicine page.')).toBeInTheDocument();
+  });
 }); 

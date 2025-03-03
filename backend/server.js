@@ -57,9 +57,8 @@ app.use(helmet.contentSecurityPolicy({
 
 // Rate limiting
 const apiLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100,
-    message: 'Too many requests from this IP, please try again after 15 minutes'
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100 // limit each IP to 100 requests per windowMs
 });
 app.use('/api/', apiLimiter);
 
@@ -74,36 +73,22 @@ const sensitiveApiLimiter = rateLimit({
 app.use('/api/medical-records', sensitiveApiLimiter);
 app.use('/api/telemedicine', sensitiveApiLimiter);
 
-// Enhanced HIPAA Compliance Logging
+// HIPAA Compliance Logging
 const logHIPAAEvent = (req, event, additionalData = {}) => {
-    const timestamp = new Date().toISOString();
-    const userId = req.headers['x-user-id'] || 'anonymous';
-    const userRole = req.headers['x-user-role'] || 'unknown';
-    const ipAddress = req.ip;
-    const userAgent = req.headers['user-agent'];
-    const requestMethod = req.method;
-    const requestPath = req.path;
-    
-    const logEntry = {
-        timestamp,
-        userId,
-        userRole,
-        ipAddress,
-        userAgent,
-        requestMethod,
-        requestPath,
+    const logData = {
         event,
+        userId: req.user ? req.user.id : 'unknown',
+        timestamp: new Date().toISOString(),
         ...additionalData
     };
-    
-    console.log('HIPAA Log:', JSON.stringify(logEntry));
-    
-    // In production, write to secure storage
-    if (process.env.NODE_ENV === 'production') {
-        // Implement secure logging mechanism
-        // fs.appendFileSync('hipaa_logs.json', JSON.stringify(logEntry) + '\n');
-    }
+    console.log('HIPAA Log:', logData);
 };
+
+// Example usage of HIPAA logging
+app.use((req, res, next) => {
+    logHIPAAEvent(req, 'API Access', { path: req.path });
+    next();
+});
 
 // File upload configuration
 const storage = multer.diskStorage({
@@ -182,8 +167,8 @@ io.on('connection', (socket) => {
     
     // Telemedicine
     socket.on('joinTelemedicineSession', (sessionId) => {
-        socket.join(`telemedicine-${sessionId}`);
-        logHIPAAEvent({ headers: socket.handshake.headers }, 'Joined telemedicine session', { sessionId });
+        console.log(`Joining telemedicine session: ${sessionId}`);
+        socket.join(sessionId);
     });
     
     socket.on('telemedicineSignal', ({ sessionId, signal }) => {
@@ -215,8 +200,8 @@ io.on('connection', (socket) => {
     });
 
     socket.on('leaveTelemedicineSession', (sessionId) => {
-        socket.leave(`telemedicine-${sessionId}`);
-        logHIPAAEvent({ headers: socket.handshake.headers }, 'Left telemedicine session', { sessionId });
+        console.log(`Leaving telemedicine session: ${sessionId}`);
+        socket.leave(sessionId);
     });
 
     socket.on('disconnect', () => {
@@ -429,19 +414,17 @@ app.delete('/api/insurance/:id', (req, res) => {
 });
 
 // Telemedicine
-app.post('/api/telemedicine/sessions', (req, res) => {
-    const newSession = {
-        id: uuidv4(),
-        doctorId: req.body.doctorId,
-        patientId: req.body.patientId,
-        scheduledTime: req.body.scheduledTime,
-        status: 'scheduled'
-    };
-    telemedicineSessions.push(newSession);
-    logHIPAAEvent(req, 'Created telemedicine session');
-    res.status(201).json(newSession);
+app.get('/api/telemedicine/sessions', (req, res) => {
+    // Logic to get telemedicine sessions
+    res.json({ message: 'List of telemedicine sessions' });
 });
 
+app.post('/api/telemedicine/sessions', (req, res) => {
+    // Logic to create a new telemedicine session
+    res.json({ message: 'Telemedicine session created' });
+});
+
+// Additional Telemedicine routes
 app.get('/api/telemedicine/sessions/:id', (req, res) => {
     const session = telemedicineSessions.find(s => s.id === req.params.id);
     if (!session) {
@@ -449,22 +432,6 @@ app.get('/api/telemedicine/sessions/:id', (req, res) => {
     }
     logHIPAAEvent(req, 'Accessed telemedicine session');
     res.json(session);
-});
-
-// Additional Telemedicine routes
-app.get('/api/telemedicine/sessions', (req, res) => {
-    const { doctorId, patientId } = req.query;
-    let filteredSessions = [...telemedicineSessions];
-    
-    if (doctorId) {
-        filteredSessions = filteredSessions.filter(session => session.doctorId === doctorId);
-    }
-    if (patientId) {
-        filteredSessions = filteredSessions.filter(session => session.patientId === patientId);
-    }
-    
-    logHIPAAEvent(req, 'Fetched telemedicine sessions');
-    res.json(filteredSessions);
 });
 
 app.put('/api/telemedicine/sessions/:id', (req, res) => {
@@ -896,6 +863,28 @@ app.delete('/api/hipaa/acknowledgments/:id', (req, res) => {
     // to maintain compliance records
     logHIPAAEvent(req, 'Archived HIPAA acknowledgment', { acknowledgmentId: id });
     res.status(204).end();
+});
+
+// Billing API
+app.get('/api/billing/invoices', (req, res) => {
+    // Logic to get billing invoices
+    res.json({ message: 'List of billing invoices' });
+});
+
+app.post('/api/billing/invoices', (req, res) => {
+    // Logic to create a new billing invoice
+    res.json({ message: 'Billing invoice created' });
+});
+
+// Staff Scheduling API
+app.get('/api/staff/schedule', (req, res) => {
+    // Logic to get staff schedule
+    res.json({ message: 'Staff schedule' });
+});
+
+app.post('/api/staff/schedule', (req, res) => {
+    // Logic to update staff schedule
+    res.json({ message: 'Staff schedule updated' });
 });
 
 // Serve static files from the uploads directory

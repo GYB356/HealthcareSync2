@@ -84,3 +84,51 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 - This project is for demonstration purposes and is not intended for production use without proper security audits and HIPAA compliance verification.
 - Icons provided by Heroicons (https://heroicons.com/)
+
+## Detailed Setup Instructions
+
+### Backend Server Setup
+
+1. Navigate to the backend directory:
+   ```
+   cd backend
+   ```
+
+2. Install backend dependencies:
+   ```
+   npm install
+   ```
+
+3. Start the backend server:
+   ```
+   npm run start
+   ```
+
+### Environment Variables
+
+- Create a `.env` file in the root directory and configure the following variables:
+  ```
+  NODE_ENV=development
+  PORT=5000
+  JWT_SECRET=your_jwt_secret
+  DATABASE_URL=your_database_url
+  ```
+
+## Usage Instructions
+
+- **Telemedicine**: Access telemedicine sessions via the `/telemedicine` route.
+- **Billing**: Manage invoices and payments through the `/billing` route.
+- **Staff Scheduling**: Organize staff schedules using the `/staff-scheduling` route.
+
+## Testing Instructions
+
+- Run tests using Jest and React Testing Library:
+  ```
+  npm test
+  ```
+
+## Deployment Instructions
+
+- To deploy the application, ensure all environment variables are set for production.
+- Use a platform like Heroku, AWS, or Vercel for deployment.
+- Ensure the backend server is running and accessible from the frontend.

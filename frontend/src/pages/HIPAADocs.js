@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 
 const HIPAADocs = () => {
-    const { user } = useAuth();
+    const { user, hasRole } = useAuth();
     const [documents, setDocuments] = useState([]);
     const [acknowledgments, setAcknowledgments] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -12,11 +12,16 @@ const HIPAADocs = () => {
     const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
+        if (!hasRole(['admin', 'compliance'])) {
+            setError('Access Denied');
+            return;
+        }
+
         fetchDocuments();
         if (user) {
             fetchAcknowledgments();
         }
-    }, [user]);
+    }, [hasRole, user]);
 
     const fetchDocuments = async () => {
         try {
@@ -59,6 +64,10 @@ const HIPAADocs = () => {
         return acknowledgments.some(ack => ack.documentId === documentId);
     };
 
+    if (error) {
+        return <div className="text-red-500">{error}</div>;
+    }
+
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -68,6 +77,10 @@ const HIPAADocs = () => {
                 </div>
             </div>
         );
+    }
+
+    if (!documents.length) {
+        return <div>Loading...</div>;
     }
 
     return (
